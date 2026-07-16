@@ -1,0 +1,19 @@
+# Python
+__pycache__/
+*.py[cod]
+
+# Checkpoints / weights
+*.pth
+*.pt
+*.ckpt
+
+# Datasets & experiment outputs
+DIBCO*/
+outputs/
+runs/
+
+# Environments & editors
+.venv/
+venv/
+.ipynb_checkpoints/
+.DS_Store
