@@ -1,6 +1,8 @@
 # DeepMine-Mamba
 
-**DeepMine-Mamba: Mitigating Information Dilution in Mamba-Based State Space Models for Document Image Binarization**
+[![arXiv](https://img.shields.io/badge/arXiv-2606.08781-b31b1b.svg)](https://arxiv.org/abs/2606.08781)
+
+**[DeepMine-Mamba: Mitigating Information Dilution in Mamba-Based State Space Models for Document Image Binarization](https://arxiv.org/abs/2606.08781)**
 
 This repository is the official implementation of **DeepMine-Mamba**, a Mamba-based document image binarization framework designed to preserve weak foreground strokes, faint ink traces, fragmented characters, and boundary-sensitive text details in degraded document images.
 
@@ -105,7 +107,7 @@ Image.fromarray(out).save("page_bin.png")
 | 2016        | 90.28     | 94.90     | 19.26     | 3.2500     |
 | 2017        | 93.31     | 95.19     | 19.39     | 2.3480     |
 | 2018        | 90.69     | 94.62     | 20.00     | 2.8745     |
-| 2019        | 75.90     | 76.40     | 15.31     | 7.8167     |
+| 2019        | 75.90     | 76.44     | 15.41     | 7.8167     |
 | **Average** | **92.56** | **94.61** | **20.88** | **2.3424** |
 
 ---
@@ -131,14 +133,14 @@ Experiments are conducted on the official DIBCO / H-DIBCO benchmark datasets. Th
 
 ## Citation
 
-Coming soon.
+If you find this work useful, please cite:
 
 ```bibtex
-@article{,
-  title={},
-  author={},
-  journal={},
-  year={}
+@article{chan2026deepmine,
+  title={DeepMine-Mamba: Mitigating Information Dilution in Mamba-Based State Space Models for Document Image Binarization},
+  author={Chan, Sheng-Wei and Wang, Yung-Che and Pan, Hsin-Jui and Lin, Chia-Min and Chiang, Jen-Shiun},
+  journal={arXiv preprint arXiv:2606.08781},
+  year={2026}
 }
 ```
 
