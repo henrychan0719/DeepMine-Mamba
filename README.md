@@ -1,88 +1,108 @@
-# DeepMine-Mamba
+# DGM-Net
 
-**DeepMine-Mamba: Mitigating Information Dilution in Mamba-Based State Space Models for Document Image Binarization**
+Official PyTorch implementation of
 
-This repository is the official implementation of **DeepMine-Mamba**, a Mamba-based document image binarization framework designed to preserve weak foreground strokes, faint ink traces, fragmented characters, and boundary-sensitive text details in degraded document images.
+**Breaking the Resource Wall: Geometry-Guided Sequence Modeling for Efficient Semantic Segmentation**
 
-> **Code will be released soon.**
-
----
+[![arXiv](https://img.shields.io/badge/arXiv-2604.23399-b31b1b.svg)](https://arxiv.org/abs/2604.23399)
 
 ## Overview
 
-Document image binarization aims to separate foreground text from degraded backgrounds while preserving thin, broken, and low-contrast strokes. Although CNN-, Transformer-, GAN-, and diffusion-based methods have been widely explored, Mamba-based state space models remain under-explored for document image binarization.
+DGM-Net (Directional Geometric Mamba Network) is an efficient semantic segmentation framework for resource-constrained settings. SSM-based operators such as Mamba offer linear-complexity long-range modeling, but tend to over-smooth during spatial propagation, degrading boundary quality. DGM-Net reformulates spatial modeling as a **geometry-conditioned propagation process**: explicit geometric priors guide feature aggregation in a structure-aware manner, preserving boundaries without sacrificing global context.
 
-DeepMine-Mamba investigates the information dilution problem in Mamba-based feature propagation. Direct long-range state-space propagation may weaken faint foreground cues, especially thin strokes, fragmented characters, and low-contrast ink traces.
+## What's in this release (paper → code)
 
-To address this issue, we propose an **Anti-Dilution Gate**, which estimates propagation-induced feature changes and selectively restores stroke-sensitive local responses after Mamba-based propagation.
+| Paper component | Code |
+|---|---|
+| **G-Mamba** — geometry-guided Mamba operator | `GMambaBlock` in [`dgm_net/model.py`](dgm_net/model.py) |
+| **Cascade GN-SSM** — 2× spatial Mamba + 1× G-Mamba | `SpatialMambaBlock`, `CascadeGN_SSM` |
+| **DGM-Module** — geometric priors (potential V / centripetal flow / boundary D / curvature) | `dgm_predictor` head + `compute_dgm_targets_adaptive` in [`dgm_net/dgm_targets.py`](dgm_net/dgm_targets.py) |
+| **GOAD** — geometry-aware offset-aligned decoder | `DGMNet.forward` |
+| Training objective — OHEM CE + Lovász + geometric terms | `DGMNetLoss_Pro` in [`dgm_net/losses.py`](dgm_net/losses.py) |
 
----
-
-## Main Contributions
-
-- We explore **Mamba-based state space modeling** for document image binarization.
-- We identify a stroke-level **information dilution problem** caused by long-range Mamba feature propagation.
-- We propose an **Anti-Dilution Gate** to restore weak foreground responses while preserving global contextual modeling.
-- We evaluate DeepMine-Mamba on DIBCO/H-DIBCO benchmarks using a strict **leave-one-year-out protocol**.
-- Experimental results show that DeepMine-Mamba achieves competitive overall performance, especially in foreground stroke preservation.
-
----
-
-## Method
-
-DeepMine-Mamba consists of the following components:
-
-- ConvNeXt-based encoder for multi-scale feature extraction
-- Sobel edge prior for detail-aware guidance
-- Four-direction Mamba propagation for long-range structural modeling
-- Anti-Dilution Gate for stroke-sensitive feature restoration
-- Refinement heads for foreground, background, and adaptive threshold prediction
-
-The overall goal is to combine the global modeling ability of Mamba with local stroke-preserving refinement.
-
----
+Training scripts and the data pipeline are not included in this release.
 
 ## Results
 
-### Leave-One-Year-Out Results on DIBCO/H-DIBCO
+### Cityscapes (val)
 
-| Test Year | FM ↑ | Fps ↑ | PSNR ↑ | DRD ↓ |
-|---|---:|---:|---:|---:|
-| 2009 | 95.74 | 96.50 | 21.59 | 1.3157 |
-| 2010 | 94.47 | 96.84 | 21.83 | 1.3455 |
-| 2011 | 95.35 | 97.56 | 21.40 | 1.3588 |
-| 2012 | 96.26 | 97.32 | 23.30 | 1.1860 |
-| 2013 | 96.15 | 97.93 | 23.13 | 1.2347 |
-| 2014 | 97.45 | 98.84 | 23.58 | 0.6938 |
-| 2016 | 90.28 | 94.90 | 19.26 | 3.2500 |
-| 2017 | 93.31 | 95.19 | 19.39 | 2.3480 |
-| 2018 | 90.69 | 94.62 | 20.00 | 2.8745 |
-| 2019 | 75.90 | 76.40 | 15.31 | 7.8167 |
-| **Average** | **92.56** | **94.61** | **20.88** | **2.3424** |
+| Setting | mIoU (%) |
+|---|---|
+| 28k iterations (SS) | 80.8 |
+| 90k iterations (SS) | 81.6 |
+| 28k + MST | 82.3 |
 
----
+### ADE20K
 
-### Ablation Study
+| Setting | mIoU (%) |
+|---|---|
+| 28k iterations | 45.24 |
+| 90k iterations | 46.43 |
 
-| Model | FM ↑ | Fps ↑ | PSNR ↑ | DRD ↓ |
-|---|---:|---:|---:|---:|
-| Baseline U-Net | 74.84 | 75.55 | 16.74 | 8.13 |
-| + ConvNeXt Encoder | 86.17 | 87.96 | 17.39 | 7.24 |
-| + Sobel Edge Prior | 87.05 | 88.53 | 17.78 | 6.51 |
-| + DeepMine-Mamba Block | 90.54 | 93.35 | 19.72 | 4.79 |
-| + Anti-Dilution Gate | 92.43 | 94.27 | 20.16 | 2.59 |
-| + Refinement Heads | **92.56** | **94.61** | **20.88** | **2.34** |
+All results are obtained under a **single-GPU (16 GB VRAM)** budget, without large-scale segmentation pretraining. Reduced configurations still reach ~77 mIoU on 8 GB GPUs.
 
----
+## Installation
+
+```bash
+pip install -r requirements.txt
+```
+
+`mamba-ssm` requires an NVIDIA GPU with CUDA. Installing `causal-conv1d` first is recommended for speed.
+
+## Usage
+
+### Inference
+
+```python
+import torch
+from dgm_net import DGMNet
+
+device = "cuda"
+model = DGMNet(n_classes=19).to(device).eval()
+
+x = torch.randn(1, 3, 768, 768, device=device)
+with torch.no_grad():
+    out_c, out_dgm = model(x)   # (B, 19, H, W), (B, 5, H, W)
+pred = out_c.argmax(1)
+```
+
+`out_dgm` channels are `[V, Gx, Gy, D_logits, C_map]`.
+
+### Generating DGM-Module targets for training
+
+```python
+import numpy as np
+from dgm_net import compute_dgm_targets_adaptive
+
+mask = np.array(...)  # (H, W) int label map, ignore label = 255
+dgm_targets = compute_dgm_targets_adaptive(mask)  # (5, H, W) float32
+```
+
+### Loss
+
+```python
+from dgm_net import DGMNetLoss_Pro
+
+criterion = DGMNetLoss_Pro(ohem_thresh=0.9, ignore_index=255).to(device)
+# model in train mode returns (out_c, out_dgm, out_aux)
+total, l_seg, l_vg, l_d = criterion(out_c, target_c, out_dgm, dgm_targets, out_aux)
+```
+
+## Datasets
+
+Cityscapes and ADE20K — please download from the official sources.
+
+## License
+
+MIT — see [LICENSE](LICENSE).
 
 ## Citation
 
-Coming soon.
-
 ```bibtex
-@article{,
-  title={},
-  author={},
-  journal={},
-  year={}
+@article{chan2026breaking,
+  title={Breaking the Resource Wall: Geometry-Guided Sequence Modeling for Efficient Semantic Segmentation},
+  author={Chan, Sheng-Wei and Pan, Hsin-Jui and Shen, Chun-Po and Lin, Chia-Min and Wang, Yung-Che and Chiang, Jen-Shiun},
+  journal={arXiv preprint arXiv:2604.23399},
+  year={2026}
 }
+```
