@@ -4,9 +4,12 @@
 
 **[DeepMine-Mamba: Mitigating Information Dilution in Mamba-Based State Space Models for Document Image Binarization](https://arxiv.org/abs/2606.08781)**
 
+
 This repository is the official implementation of **DeepMine-Mamba**, a Mamba-based document image binarization framework designed to preserve weak foreground strokes, faint ink traces, fragmented characters, and boundary-sensitive text details in degraded document images.
 
-> **Release note:** this repository provides the core model architecture ([`deepmine_mamba.py`](deepmine_mamba.py)) together with a sliding-window inference helper for full-page images. The full training pipeline (data augmentation and loss functions) is not released.
+---
+
+## Overview
 
 ---
 
